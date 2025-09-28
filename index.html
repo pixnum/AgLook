@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgLook - Age Calculator</title>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background: #f0f4f8;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        padding: 40px 20px;
+        transition: background 0.3s, color 0.3s;
+    }
+    body.dark-mode {
+        background: #121212;
+        color: #e0e0e0;
+    }
+    .container {
+        position: relative;
+        background: #fff;
+        padding: 30px;
+        border-radius: 16px;
+        border: 2px solid #ccc;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        width: 100%;
+        max-width: 650px;
+        margin: auto;
+        transition: background 0.3s, color 0.3s, border 0.3s;
+    }
+    body.dark-mode .container {
+        background: #1e1e1e;
+        border: 2px solid #444;
+    }
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    label {
+        display: block;
+        margin-top: 12px;
+    }
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        transition: background 0.3s, color 0.3s, border 0.3s;
+    }
+    body.dark-mode input, body.dark-mode select {
+        background: #2c2c2c;
+        color: #e0e0e0;
+        border: 1px solid #555;
+    }
+    button {
+        margin-top: 20px;
+        width: 100%;
+        padding: 12px;
+        background: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s;
+    }
+    button:hover {
+        background: #0056b3;
+    }
+    #darkModeToggle {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        border: none;
+        background: #555;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background 0.3s;
+    }
+    #darkModeToggle:hover {
+        background: #333;
+    }
+    .result {
+        margin-top: 25px;
+        padding: 15px;
+        background: #e0f7fa;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: bold;
+        transition: background 0.3s, color 0.3s;
+    }
+    body.dark-mode .result {
+        background: #333;
+        color: #e0e0e0;
+    }
+    .health-good {
+        color: #28a745; /* green */
+    }
+    .health-average {
+        color: #ff9800; /* orange */
+    }
+    .health-poor {
+        color: #e53935; /* red */
+    }
+    .health-bar-container {
+        margin-top: 12px;
+        width: 100%;
+        background: #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        height: 18px;
+    }
+    .health-bar {
+        height: 100%;
+        width: 0%;
+        background: #28a745;
+        text-align: center;
+        color: white;
+        font-size: 12px;
+        line-height: 18px;
+        transition: width 0.5s ease-in-out, background 0.5s;
+    }
+    .tips {
+        margin-top: 15px;
+        font-size: 14px;
+        text-align: left;
+    }
+    canvas {
+        margin-top: 20px;
+    }
+    footer {
+        margin-top: 25px;
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+    }
+    body.dark-mode footer {
+        color: #aaa;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <button id="darkModeToggle">☾</button>
+    <h1>AgLook</h1>
+
+    <label for="birthdate">Birthdate:</label>
+    <input type="date" id="birthdate" required>
+
+    <label for="weight">Weight (kg):</label>
+    <input type="number" id="weight" min="20" max="300" value="70">
+
+    <label for="height">Height (cm):</label>
+    <input type="number" id="height" min="50" max="250" value="170">
+
+    <label for="restingHeartRate">Resting Heart Rate (bpm):</label>
+    <input type="number" id="restingHeartRate" min="40" max="120" value="70">
+
+    <label for="systolic">Blood Pressure - Systolic (mmHg):</label>
+    <input type="number" id="systolic" min="80" max="200" value="120">
+
+    <label for="diastolic">Blood Pressure - Diastolic (mmHg):</label>
+    <input type="number" id="diastolic" min="50" max="130" value="80">
+
+    <label for="exercise">Exercise per week (hours):</label>
+    <input type="number" id="exercise" min="0" max="50" value="3">
+
+    <label for="sleep">Average sleep per night (hours):</label>
+    <input type="number" id="sleep" min="0" max="24" value="7">
+
+    <label for="stress">Stress level (1-low, 5-high):</label>
+    <select id="stress">
+        <option value="1">1 - Low</option>
+        <option value="2">2</option>
+        <option value="3">3 - Moderate</option>
+        <option value="4">4</option>
+        <option value="5">5 - High</option>
+    </select>
+
+    <label for="diet">Diet quality (1-poor, 5-excellent):</label>
+    <select id="diet">
+        <option value="1">1 - Poor</option>
+        <option value="2">2</option>
+        <option value="3">3 - Average</option>
+        <option value="4">4</option>
+        <option value="5">5 - Excellent</option>
+    </select>
+
+    <label for="smoking">Smoking (cigarettes/day):</label>
+    <input type="number" id="smoking" min="0" max="50" value="0">
+
+    <label for="alcohol">Alcohol (drinks/week):</label>
+    <input type="number" id="alcohol" min="0" max="50" value="0">
+
+    <button onclick="calculateAge()">Calculate Age</button>
+
+    <div class="result" id="result"></div>
+    <div class="health-bar-container">
+        <div class="health-bar" id="healthBar">0%</div>
+    </div>
+    <div class="tips" id="tips"></div>
+    <canvas id="ageChart" width="400" height="200"></canvas>
+
+    <footer>© Manik Roy 2025 | All Rights Reserved.</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.getElementById('darkModeToggle').onclick = () => {
+    document.body.classList.toggle('dark-mode');
+    document.getElementById('darkModeToggle').textContent = 
+        document.body.classList.contains('dark-mode') ? "☀" : "☾";
+};
+
+function calculateAge() {
+    const birthdate = new Date(document.getElementById('birthdate').value);
+    if (!birthdate.getTime()) { alert("Please enter a valid birthdate."); return; }
+
+    const today = new Date();
+    let age = today.getFullYear() - birthdate.getFullYear();
+    const monthDiff = today.getMonth() - birthdate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) age--;
+
+    const weight = parseFloat(document.getElementById('weight').value);
+    const height = parseFloat(document.getElementById('height').value)/100;
+    const restingHR = parseFloat(document.getElementById('restingHeartRate').value);
+    const systolic = parseFloat(document.getElementById('systolic').value);
+    const diastolic = parseFloat(document.getElementById('diastolic').value);
+    const exercise = parseFloat(document.getElementById('exercise').value);
+    const sleep = parseFloat(document.getElementById('sleep').value);
+    const stress = parseInt(document.getElementById('stress').value);
+    const diet = parseInt(document.getElementById('diet').value);
+    const smoking = parseInt(document.getElementById('smoking').value);
+    const alcohol = parseInt(document.getElementById('alcohol').value);
+
+    let bioAge = age;
+    let suggestions = [];
+    let healthScore = 100;
+
+    // BMI
+    const bmi = weight / (height * height);
+    if (bmi < 18.5) { bioAge += 2; healthScore -= 5; suggestions.push("Gain some weight to reach a healthy BMI."); }
+    else if (bmi > 25 && bmi < 30) { bioAge += 2; healthScore -= 5; suggestions.push("Lose some weight to stay in the healthy range."); }
+    else if (bmi >= 30) { bioAge += 5; healthScore -= 10; suggestions.push("Reduce BMI to lower your biological age."); }
+
+    // Resting HR
+    if (restingHR < 50) { bioAge -= 2; healthScore += 2; suggestions.push("Excellent heart health!"); }
+    else if (restingHR > 80) { bioAge += Math.floor((restingHR-80)/5); healthScore -= 5; suggestions.push("Improve cardiovascular fitness to lower resting HR."); }
+
+    // Blood Pressure
+    if (systolic < 90 || diastolic < 60) { bioAge += 1; healthScore -= 2; suggestions.push("Low blood pressure — consult doctor if symptoms occur."); }
+    else if ((systolic >= 120 && systolic <= 129) && diastolic < 80) { healthScore += 3; suggestions.push("Optimal blood pressure — great for heart health."); }
+    else if ((systolic >= 130 && systolic <= 139) || (diastolic >= 80 && diastolic <= 89)) { bioAge += 2; healthScore -= 5; suggestions.push("Stage 1 hypertension — adopt lifestyle changes."); }
+    else if ((systolic >= 140 && systolic <= 159) || (diastolic >= 90 && diastolic <= 99)) { bioAge += 4; healthScore -= 10; suggestions.push("Stage 2 hypertension — monitor closely."); }
+    else if (systolic >= 160 || diastolic >= 100) { bioAge += 6; healthScore -= 15; suggestions.push("Severe hypertension — seek medical advice."); }
+
+    // Exercise
+    if (exercise < 2) { bioAge += 2; healthScore -= 5; suggestions.push("Exercise at least 2–3 hrs per week."); }
+    else if (exercise > 5) { bioAge -= 1; healthScore += 2; suggestions.push("Great job staying active!"); }
+
+    // Sleep
+    if (sleep < 6) { bioAge += 3; healthScore -= 7; suggestions.push("Increase sleep to 7–8 hrs per night."); }
+    else if (sleep > 9) { bioAge += 1; healthScore -= 2; suggestions.push("Too much sleep can also be harmful."); }
+
+    // Stress
+    if (stress === 5) { bioAge += 3; healthScore -= 7; suggestions.push("Reduce stress via meditation or hobbies."); }
+    else if (stress === 1) { bioAge -= 1; healthScore += 3; suggestions.push("Low stress is excellent for longevity."); }
+
+    // Diet
+    if (diet <= 2) { bioAge += 2; healthScore -= 5; suggestions.push("Improve diet with more fruits & veggies."); }
+    else if (diet >= 4) { bioAge -= 1; healthScore += 2; suggestions.push("Healthy diet is protecting your age."); }
+
+    // Smoking
+    if (smoking > 0) { 
+        bioAge += Math.floor(smoking/10) * 5; 
+        healthScore -= smoking > 20 ? 20 : 10;
+        suggestions.push("Quit smoking — it heavily increases age.");
+    }
+
+    // Alcohol
+    if (alcohol > 14) { bioAge += 3; healthScore -= 5; suggestions.push("Reduce alcohol consumption."); }
+
+    bioAge = Math.max(0, Math.round(bioAge * 10)/10);
+    healthScore = Math.min(100, Math.max(0, Math.round(healthScore)));
+
+    let healthClass = "health-average";
+    let barColor = "#ff9800";
+    if (healthScore >= 75) { healthClass = "health-good"; barColor = "#28a745"; }
+    else if (healthScore < 50) { healthClass = "health-poor"; barColor = "#e53935"; }
+
+    document.getElementById('result').innerHTML = 
+        `Real Age: ${age} years<br>Biological Age: ${bioAge} years<br><span class="${healthClass}">Health Score: ${healthScore}/100</span>`;
+
+    const healthBar = document.getElementById('healthBar');
+    healthBar.style.width = healthScore + "%";
+    healthBar.style.background = barColor;
+    healthBar.textContent = healthScore + "%";
+
+    document.getElementById('tips').innerHTML = `<b>Suggestions:</b><br>- ${suggestions.join("<br>- ")}`;
+
+    const ctx = document.getElementById('ageChart').getContext('2d');
+    if(window.ageChart) window.ageChart.destroy();
+    window.ageChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Real Age', 'Biological Age', 'Health Score'],
+            datasets: [{
+                label: 'Values',
+                data: [age, bioAge, healthScore],
+                backgroundColor: ['#007BFF', '#FF5733', '#28A745']
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true, max: Math.max(age, bioAge, healthScore)+10 } }
+        }
+    });
+}
+</script>
+</body>
+</html>
